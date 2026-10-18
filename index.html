@@ -3,523 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Boletero - Experiencia Interactiva</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>El Boletero - Experiencia Analítica</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Oswald:wght@400;700&display=swap');
+
         :root {
-            --bg-theater: #0b0f14;
-            --accent-gold: #e6b31e;
-            --ticket-bg: #f4ebd9;
-            --ticket-text: #2c2a26;
-            --curtain-red: #8b0000;
+            --bg-dark: #121212;
+            --accent-red: #E50914;
+            --ticket-bg: #f4ebd0;
+            --text-dark: #222;
         }
 
         body {
-            background-color: var(--bg-theater);
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            background-image: radial-gradient(circle at center, #1a2332 0%, #0b0f14 100%);
+            margin: 0;
+            padding: 0;
+            font-family: 'Oswald', sans-serif;
+            background-color: var(--bg-dark);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
         }
 
-        h1, h2, h3, .bebas { font-family: 'Bebas Neue', cursive; letter-spacing: 2px; }
-        .courier { font-family: 'Courier Prime', monospace; }
-        .glow-text { text-shadow: 0 0 15px rgba(230, 179, 30, 0.6); }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
 
-        /* Control de pantallas (SPA) */
+        /* Pantallas */
         .screen {
             display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-            flex-grow: 1;
-            padding: 2rem 1rem;
+            animation: fadeIn 0.5s ease-in-out;
         }
         .screen.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            opacity: 1;
+            display: block;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 { text-transform: uppercase; letter-spacing: 2px; }
+        h1 { color: var(--accent-red); margin-bottom: 5px; }
+        .subtitle { color: #888; margin-top: 0; margin-bottom: 30px; font-family: sans-serif; }
+
+        /* Botones Generales */
+        .btn-general {
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin-top: 15px;
+        }
+        .btn-general:hover {
+            background-color: #b20710;
+            transform: scale(1.05);
+        }
+
+        /* Minijuego Memoria (Nivel 1) */
         .memory-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 0.5rem;
-            max-width: 400px;
-            margin: 0 auto;
+            gap: 10px;
+            margin: 20px auto;
+            max-width: 350px;
         }
-        @media (max-width: 400px) {
-            .memory-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-
-        .memory-card {
-            width: 60px;
-            height: 60px;
-            position: relative;
-            cursor: pointer;
-            transform-style: preserve-3d;
-            transition: transform 0.5s;
-        }
-        @media (max-width: 400px) {
-            .memory-card { width: 50px; height: 50px; }
-        }
-        
-        .memory-card.flipped { transform: rotateY(180deg); pointer-events: none; }
-        
-        .memory-card-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
+        .card {
+            background: #333;
+            height: 70px;
             border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+            transform-style: preserve-3d;
         }
-        .memory-card-front {
-            background-color: #2a3441;
-            border: 2px solid var(--accent-gold);
-            color: var(--accent-gold);
-        }
-        .memory-card-back {
-            background-color: var(--accent-gold);
-            color: black;
-            transform: rotateY(180deg);
-        }
+        .card.flipped { background: white; cursor: default; }
+        .card-hidden { opacity: 0; }
+        #btn-next-level1 { display: none; width: 100%; margin-top: 20px; }
 
-        .puzzle-board {
+        /* Minijuego Rompecabezas (Nivel 2) */
+        .puzzle-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 2px;
+            margin: 20px auto;
             width: 300px;
             height: 300px;
-            background-color: #2a3441;
-            padding: 4px;
-            border-radius: 8px;
-            margin: 0 auto;
-            border: 2px solid var(--accent-gold);
+            background: #111;
+            border: 4px solid #333;
         }
         .puzzle-tile {
             width: 100%;
             height: 100%;
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/c/cb/Adobe_After_Effects_CC_icon.svg');
-            background-color: #0b0f14;
+            background-color: #1b1b3a; 
+            background-image: url('image_e7f400.png');
+            background-size: 300px 300px;
             cursor: pointer;
-            border-radius: 4px;
-            transition: transform 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.6); 
+            text-shadow: 1px 1px 2px black;
         }
-        .puzzle-tile:active {
-            transform: scale(0.95);
-        }
-        .puzzle-tile.empty {
-            background-image: none;
-            background-color: transparent;
+        .puzzle-empty {
+            background: #111 !important;
+            color: transparent !important;
             cursor: default;
         }
+        #btn-next-level2 { display: none; width: 100%; margin-top: 20px; }
 
+        /* Trivia (Nivel 3) */
+        .question-box {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-family: sans-serif;
+            line-height: 1.5;
+            font-size: 1.1rem;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            background: #333;
+            margin: 10px 0;
+            text-align: left;
+            text-transform: none;
+            font-family: sans-serif;
+            position: relative;
+            padding: 15px;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .option-btn:hover { background: #444; }
+        
+        /* Efectos Trivia */
+        .wrong-answer {
+            background-color: #ff4d4d !important;
+            animation: shake 0.4s;
+        }
+        .wrong-answer::after { content: ' ❌'; position: absolute; right: 15px; }
+        .correct-answer { background-color: #4CAF50 !important; }
+        .correct-answer::after { content: ' ✅'; position: absolute; right: 15px; }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Resultados (Boleto y Popcorn) */
         .ticket {
-            background-color: var(--ticket-bg);
-            color: var(--ticket-text);
+            background: var(--ticket-bg);
+            color: var(--text-dark);
+            padding: 20px;
+            border-radius: 10px;
             position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            border: 2px solid #d3c5ad;
-            border-radius: 12px;
-            mask-image: radial-gradient(circle at 0 50%, transparent 15px, black 16px), radial-gradient(circle at 100% 50%, transparent 15px, black 16px);
-            mask-size: 51% 100%;
-            mask-repeat: no-repeat;
-            mask-position: left, right;
-            -webkit-mask-image: radial-gradient(circle at 0 50%, transparent 15px, black 16px), radial-gradient(circle at 100% 50%, transparent 15px, black 16px);
-            -webkit-mask-size: 51% 100%;
-            -webkit-mask-repeat: no-repeat;
-            -webkit-mask-position: left, right;
-            animation: slideUpTicket 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            opacity: 0;
-            transform: translateY(100px);
+            font-family: 'Courier Prime', monospace;
+            text-align: left;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            background-image: radial-gradient(circle at 0 50%, transparent 10px, var(--ticket-bg) 11px), radial-gradient(circle at 100% 50%, transparent 10px, var(--ticket-bg) 11px);
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
         }
-        @keyframes slideUpTicket {
-            to { opacity: 1; transform: translateY(0); }
+        .ticket-header {
+            text-align: center;
+            border-bottom: 2px dashed #888;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
         }
-
-        .ticket-header-img {
-            background-image: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=800&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            height: 160px;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            position: relative;
-            filter: sepia(0.4) contrast(1.2);
+        .ticket-data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            font-size: 0.9rem;
         }
-        .ticket-header-img::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0; height: 50%;
-            background: linear-gradient(to top, var(--ticket-bg) 0%, transparent 100%);
-        }
-
+        .ticket-data div span { display: block; font-weight: bold; font-size: 1.1rem; }
         .barcode {
-            background: repeating-linear-gradient(to right, var(--ticket-text), var(--ticket-text) 2px, transparent 2px, transparent 4px, var(--ticket-text) 4px, var(--ticket-text) 5px, transparent 5px, transparent 8px);
-            height: 40px; width: 100%;
+            margin-top: 20px;
+            height: 40px;
+            background: repeating-linear-gradient(90deg, #222, #222 2px, transparent 2px, transparent 4px, #222 4px, #222 8px, transparent 8px, transparent 10px);
         }
 
         .popcorn-box {
+            background: #E50914;
+            color: white;
+            padding: 20px;
+            border-radius: 0 0 20px 20px;
             position: relative;
-            background: repeating-linear-gradient(90deg, #d32f2f, #d32f2f 20px, #ffffff 20px, #ffffff 40px);
-            border-radius: 5px 5px 15px 15px;
-            box-shadow: inset 0 -20px 20px rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.5);
-            color: #000;
-            animation: fadeIn 1s ease-out 1s forwards;
-            opacity: 0;
+            border-top: 10px dashed white;
         }
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        .btn-primary {
-            background-color: var(--accent-gold);
-            color: black;
-            font-family: 'Bebas Neue', cursive;
-            transition: all 0.3s;
-        }
-        .btn-primary:hover {
-            background-color: #ffd700;
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(230, 179, 30, 0.5);
-        }
+        .popcorn-title { font-size: 1.5rem; border-bottom: 2px solid white; padding-bottom: 10px; }
+        .popcorn-content { text-align: left; font-family: sans-serif; font-size: 0.95rem; margin-top: 15px; line-height: 1.6;}
         
-        .message-box {
-            position: fixed;
-            top: 20px; left: 50%; transform: translateX(-50%);
-            background: #ff4444; color: white;
-            padding: 1rem 2rem; border-radius: 8px;
-            font-weight: bold; z-index: 1000;
-            display: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
+        #error-msg { color: #ff4d4d; margin-top: 10px; font-family: sans-serif; font-size: 0.9rem; }
     </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <!-- Mensajes de Alerta Customizados -->
-    <div id="alertBox" class="message-box courier"></div>
-
-    <div id="screen-login" class="screen active justify-center">
-        <div class="text-center mb-8">
-            <i class="fas fa-ticket-alt text-6xl text-[var(--accent-gold)] mb-4"></i>
-            <h1 class="text-6xl md:text-8xl text-[var(--accent-gold)] glow-text mb-2">EL BOLETERO</h1>
-            <p class="text-xl text-gray-300 courier max-w-md mx-auto">SISTEMA DE ACCESO A DATOS DE CONSUMO AUDIOVISUAL</p>
-        </div>
-
-        <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-2xl max-w-md w-full text-center">
-            <h2 class="text-3xl text-white mb-6">INGRESA TU NOMBRE</h2>
-            <p class="text-sm text-gray-400 mb-6 font-light">Para generar tu ticket y ver tus resultados, por favor ingresa tu nombre (tal como se te indicó en clase).</p>
+    <div class="container">
+        
+        <!-- PANTALLA LOGIN -->
+        <div id="screen-login" class="screen active">
+            <!-- Ícono de boleto -->
+            <div style="font-size: 3.5rem; color: #eab308; margin-bottom: -15px;">🎫</div>
             
-            <input type="text" id="user-code" placeholder="Ej: JUAN PEREZ" class="w-full bg-gray-900 border-2 border-gray-600 text-white text-center text-2xl py-3 rounded mb-6 focus:outline-none focus:border-[var(--accent-gold)] courier uppercase" autocomplete="off">
+            <!-- Título con brillo -->
+            <h1 style="color: #eab308; text-shadow: 0 0 25px rgba(234, 179, 8, 0.6); font-size: 3.5rem; margin: 10px 0;">EL BOLETERO</h1>
             
-            <button onclick="intentarLogin()" class="btn-primary w-full text-2xl py-3 rounded">
-                VALIDAR IDENTIDAD <i class="fas fa-arrow-right ml-2"></i>
-            </button>
-        </div>
-    </div>
+            <p class="subtitle" style="font-family: 'Courier Prime', monospace; color: #e5e7eb; font-size: 1.1rem; margin-bottom: 5px;">SISTEMA DE ACCESO A DATOS DE CONSUMO AUDIOVISUAL</p>
+            
+            <!-- Créditos solicitados -->
+            <p style="color: #9ca3af; font-family: 'Courier Prime', monospace; font-size: 0.9rem; margin-top: 0; margin-bottom: 30px;">
+                Elaborado por Javier Meza - Jhon Quintero
+            </p>
 
-    <div id="screen-game1" class="screen">
-        <div class="text-center mb-6 w-full max-w-2xl">
-            <h2 class="text-4xl text-[var(--accent-gold)] mb-2"><i class="fas fa-brain mr-2"></i> NIVEL 1/3: MEMORIA</h2>
-            <p class="text-gray-300">Encuentra las 8 parejas para continuar.</p>
-            <div class="h-1 w-full bg-gray-800 mt-4 rounded"><div class="h-full bg-[var(--accent-gold)] rounded" style="width: 33%"></div></div>
-        </div>
-
-        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-2xl w-full max-w-3xl flex flex-col items-center">
-            <div class="memory-grid" id="memory-board">
-                <!-- Tarjetas generadas por JS -->
-            </div>
-            <p class="mt-6 text-[var(--accent-gold)] font-bold hidden text-xl" id="memory-success">¡Excelente memoria!</p>
-            <button onclick="siguienteNivel('game-puzzle')" id="btn-next-game1" class="btn-primary mt-4 px-8 py-3 rounded text-2xl hidden">
-                CONTINUAR <i class="fas fa-play ml-2"></i>
-            </button>
-        </div>
-    </div>
-
-    <div id="screen-game-puzzle" class="screen">
-        <div class="text-center mb-6 w-full max-w-2xl">
-            <h2 class="text-4xl text-[var(--accent-gold)] mb-2"><i class="fas fa-puzzle-piece mr-2"></i> NIVEL 2/3: ROMPECABEZAS</h2>
-            <p class="text-gray-300">Ordena el logo de After Effects deslizando las piezas adyacentes al espacio vacío.</p>
-            <div class="h-1 w-full bg-gray-800 mt-4 rounded"><div class="h-full bg-[var(--accent-gold)] rounded" style="width: 66%"></div></div>
-        </div>
-
-        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-2xl w-full max-w-3xl flex flex-col items-center">
-            <div class="puzzle-board" id="puzzle-board">
-                <!-- Piezas generadas por JS -->
-            </div>
-            <p class="mt-6 text-[var(--accent-gold)] font-bold hidden text-xl" id="puzzle-success">¡Logo completado!</p>
-            <button onclick="siguienteNivel('game-trivia')" id="btn-next-puzzle" class="btn-primary mt-4 px-8 py-3 rounded text-2xl hidden">
-                CONTINUAR <i class="fas fa-play ml-2"></i>
-            </button>
-        </div>
-    </div>
-
-    <div id="screen-game-trivia" class="screen">
-        <div class="text-center mb-6 w-full max-w-2xl">
-            <h2 class="text-4xl text-[var(--accent-gold)] mb-2"><i class="fas fa-question-circle mr-2"></i> NIVEL 3/3: TRIVIA</h2>
-            <p class="text-gray-300">Demuestra tus conocimientos de diseño.</p>
-            <div class="h-1 w-full bg-gray-800 mt-4 rounded"><div class="h-full bg-[var(--accent-gold)] rounded" style="width: 100%"></div></div>
-        </div>
-
-        <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-2xl max-w-lg w-full text-center">
-            <div id="trivia-container">
-                <span class="text-sm text-[var(--accent-gold)] courier font-bold mb-2 block" id="trivia-counter">PREGUNTA 1/3</span>
-                <h3 class="text-2xl text-white mb-6 font-medium font-sans" id="trivia-question">Cargando...</h3>
+            <!-- Tarjeta de ingreso -->
+            <div style="background-color: #1f2937; padding: 30px; border-radius: 12px; border: 1px solid #374151; max-width: 400px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <h3 style="margin-top: 0; font-size: 1.5rem; letter-spacing: 1px; color: #f9fafb;">INGRESA TU NOMBRE</h3>
+                <p style="color: #9ca3af; font-size: 0.95rem; margin-bottom: 25px; font-family: sans-serif; line-height: 1.4;">
+                    Para generar tu ticket y ver tus resultados, por favor ingresa tu nombre (tal como se te indicó en clase).
+                </p>
                 
-                <div class="flex flex-col gap-3" id="trivia-options">
-                    <!-- Opciones generadas por JS -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="screen-results" class="screen pt-8 pb-12">
-        <div class="text-center mb-8 animate-fade-up">
-            <h2 class="text-5xl text-[var(--accent-gold)] glow-text mb-2">¡EXPERIENCIA COMPLETADA!</h2>
-            <p class="text-xl text-gray-300">Aquí está tu entrada oficial con tus datos de consumo reales.</p>
-            <div class="h-1 w-full max-w-2xl mx-auto bg-gray-800 mt-4 rounded"><div class="h-full bg-green-500 rounded" style="width: 100%"></div></div>
-        </div>
-
-        <div class="flex flex-col lg:flex-row gap-12 items-start justify-center w-full max-w-6xl px-4">
-            
-            <!-- CONTENEDOR DEL TICKET -->
-            <div class="w-full max-w-md mx-auto">
-                <div class="flex items-center justify-center mb-4">
-                    <i class="fas fa-ticket-alt text-[var(--accent-gold)] text-xl mr-2"></i>
-                    <h3 class="text-2xl text-white bebas tracking-widest">TU TICKET PERSONAL</h3>
+                <div class="input-group" style="margin: 0;">
+                    <input type="text" id="username" placeholder="EJ: JUAN PEREZ" autocomplete="off" 
+                           style="width: 100%; box-sizing: border-box; background: #111827; border: 1px solid #374151; margin-bottom: 15px; color: #f9fafb; padding: 15px; font-size: 1.2rem; text-align: center; border-radius: 8px; font-family: 'Courier Prime', monospace; text-transform: uppercase;">
+                    <div id="error-msg"></div>
                 </div>
                 
-                <div id="physical-ticket" class="ticket w-full mx-auto pb-4">
-                    <div class="ticket-header-img w-full flex items-end justify-center pb-2"></div>
-                    
-                    <div class="px-8 pt-4 pb-2 text-center border-b-2 border-dashed border-gray-400 mx-4">
-                        <h2 class="text-4xl text-black font-bold tracking-widest bebas mb-1 truncate" id="t-user">NOMBRE</h2>
-                        <p class="courier font-bold text-gray-700 text-sm tracking-widest">MUESTRA: 22 PERSONAS</p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-y-6 gap-x-4 px-8 py-6">
-                        <!-- Horas -->
-                        <div class="flex items-start">
-                            <i class="far fa-clock text-2xl mt-1 mr-3 text-gray-800"></i>
-                            <div>
-                                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Horas Semanales:</p>
-                                <p class="text-2xl bebas text-black leading-none" id="t-hours">0</p>
-                                <div class="flex items-end gap-1 mt-1 h-3" id="t-hours-bars"></div>
-                            </div>
-                        </div>
-                        <!-- Género -->
-                        <div class="flex items-start">
-                            <i class="fas fa-film text-2xl mt-1 mr-3 text-gray-800"></i>
-                            <div>
-                                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Género Favorito:</p>
-                                <p class="text-xl bebas text-black leading-tight" id="t-genre">---</p>
-                            </div>
-                        </div>
-                        <!-- Plataforma -->
-                        <div class="flex items-start">
-                            <i class="fas fa-tv text-2xl mt-1 mr-3 text-gray-800"></i>
-                            <div>
-                                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Plataforma:</p>
-                                <p class="text-xl bebas text-black leading-tight" id="t-platform">---</p>
-                            </div>
-                        </div>
-                        <!-- Dispositivo -->
-                        <div class="flex items-start">
-                            <i class="fas fa-mobile-alt text-2xl mt-1 mr-3 text-gray-800"></i>
-                            <div>
-                                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">Dispositivo:</p>
-                                <p class="text-xl bebas text-black leading-tight" id="t-device">---</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="px-6 py-4 bg-[#e8deca] mx-4 rounded flex flex-col items-center">
-                        <p class="text-[9px] text-center font-bold text-gray-600 mb-1 leading-tight">PROYECTO ACADÉMICO: CONSUMO AUDIOVISUAL<br>ANÁLISIS DE DATOS Y DISEÑO</p>
-                        <div class="w-full flex items-center justify-between mt-2">
-                            <div class="flex-grow mr-4">
-                                <div class="barcode mb-1"></div>
-                                <p class="text-xs courier font-bold tracking-widest text-center" id="t-barcode-text">0 00000 00000 0</p>
-                            </div>
-                            <div class="w-12 h-12 bg-white border border-gray-400 flex flex-wrap p-0.5">
-                                <i class="fas fa-qrcode text-4xl text-black"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <button onclick="iniciarSesion()" 
+                        style="width: 100%; background-color: #eab308; color: #111827; font-weight: bold; border-radius: 6px; display: flex; justify-content: center; align-items: center; gap: 10px; padding: 15px; font-size: 1.2rem; font-family: 'Oswald', sans-serif; text-transform: uppercase; border: none; cursor: pointer; transition: transform 0.2s;">
+                    VALIDAR IDENTIDAD ➔
+                </button>
             </div>
-
-            <!-- CONTENEDOR DE CONCLUSIONES (PALOMITAS) -->
-            <div class="w-full max-w-lg mx-auto">
-                <div class="flex items-center justify-center mb-4">
-                    <i class="fas fa-box-open text-[var(--accent-gold)] text-xl mr-2"></i>
-                    <h3 class="text-2xl text-white bebas tracking-widest">CONCLUSIONES GLOBALES (N=22)</h3>
-                </div>
-
-                <div class="popcorn-box p-6 md:p-8">
-                    <div class="absolute -top-12 right-0 opacity-30 transform rotate-12 pointer-events-none">
-                        <i class="fas fa-cloud text-8xl text-white"></i>
-                    </div>
-                    
-                    <div class="bg-white bg-opacity-95 p-6 rounded-lg w-full z-10 shadow-lg border border-red-200 relative">
-                        <h3 class="bebas text-3xl text-red-700 mb-4 border-b-2 border-red-200 pb-2 flex items-center">
-                            <i class="fas fa-chart-pie mr-3 text-[var(--accent-gold)]"></i> Hallazgos del Estudio
-                        </h3>
-                        
-                        <!-- AQUÍ PUEDES EDITAR TUS CONCLUSIONES REALES -->
-                        <ul class="space-y-4 text-gray-800 text-sm md:text-base">
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
-                                <p><strong>Dominio Móvil:</strong> Gran parte de la muestra prefiere consumir contenido a través de dispositivos móviles, aprovechando trayectos y tiempos muertos.</p>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
-                                <p><strong>Fraccionamiento:</strong> Existe una clara tendencia a ver series cortas de lunes a viernes, dejando las películas de mayor duración para los fines de semana.</p>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
-                                <p><strong>Multiplataforma:</strong> En promedio, cada usuario alterna entre 2 plataformas distintas, siendo Netflix y Max las opciones predominantes.</p>
-                            </li>
-                        </ul>
-                        
-                        <div class="mt-8 text-center">
-                            <button onclick="reiniciarExperiencia()" class="bg-gray-800 text-white px-6 py-2 rounded-full text-sm hover:bg-gray-700 transition courier font-bold">
-                                <i class="fas fa-redo mr-2"></i> EVALUAR OTRO PERFIL
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
+
+        <!-- PANTALLA NIVEL 1: MEMORIA -->
+        <div id="screen-level1" class="screen">
+            <h2>Nivel 1: Memoria Cinéfila</h2>
+            <p class="subtitle">Encuentra los 8 pares para avanzar.</p>
+            <div class="memory-grid" id="memory-board"></div>
+            <button id="btn-next-level1" class="btn-general" onclick="iniciarNivel2()">Continuar al Nivel 2</button>
+        </div>
+
+        <!-- PANTALLA NIVEL 2: ROMPECABEZAS AE -->
+        <div id="screen-level2" class="screen">
+            <h2>Nivel 2: Edición Visual</h2>
+            <p class="subtitle">Ordena el logo de After Effects del 1 al 8 deslizando las piezas.</p>
+            <div class="puzzle-grid" id="puzzle-board"></div>
+            <button id="btn-next-level2" class="btn-general" onclick="iniciarNivel3()">Continuar a la Trivia</button>
+        </div>
+
+        <!-- PANTALLA NIVEL 3: TRIVIA -->
+        <div id="screen-level3" class="screen">
+            <h2>Nivel 3: Diseño Analítico</h2>
+            <p class="subtitle">Responde correctamente para imprimir tu boleto.</p>
+            <div class="question-box" id="question-text">Pregunta...</div>
+            <div id="options-board"></div>
+        </div>
+
+        <!-- PANTALLA RESULTADOS -->
+        <div id="screen-results" class="screen">
+            <h2>¡Experiencia Completada!</h2>
+            
+            <!-- EL BOLETO -->
+            <div class="ticket">
+                <div class="ticket-header">
+                    <h2 style="margin:0; color: #222;">ADMISIÓN GENERAL</h2>
+                    <p style="margin: 5px 0 0 0; font-family: sans-serif; font-weight:bold; color: #555;" id="t-name">USER-00</p>
+                </div>
+                <div class="ticket-data">
+                    <div>Horas Semanales: <span id="t-hours">0</span></div>
+                    <div>Plataforma: <span id="t-platform">XXX</span></div>
+                    <div>Género Favorito: <span id="t-genre">XXX</span></div>
+                    <div>Dispositivo: <span id="t-device">XXX</span></div>
+                </div>
+                <div class="barcode"></div>
+            </div>
+
+            <!-- CAJA DE PALOMITAS (CONCLUSIONES) -->
+            <div class="popcorn-box">
+                <div class="popcorn-title">🍿 CONCLUSIONES DEL ESTUDIO</div>
+                <div class="popcorn-content">
+                    <p><strong>1. El streaming domina:</strong> La mayoría de los encuestados prefieren plataformas de streaming sobre medios tradicionales, priorizando la visualización en dispositivos móviles.</p>
+                    <p><strong>2. Consumo fragmentado:</strong> Las series ganan frente a las películas debido a la flexibilidad de tiempo de los estudiantes universitarios de diseño.</p>
+                    <p><strong>3. Horarios nocturnos:</strong> El pico de consumo audiovisual se concentra entre las 8:00 PM y las 11:00 PM, funcionando como método de desconexión.</p>
+                </div>
+            </div>
+            
+            <button class="btn-general" onclick="location.reload()" style="margin-top: 30px;">Reiniciar Juego</button>
+        </div>
+
     </div>
 
     <script>
-        
-        // =========================================================================
-        // BASE DE DATOS REAL (Reemplaza estos ejemplos con los datos de tu clase)
-        // La llave principal (ej. "JUAN PEREZ") es lo que el usuario debe escribir 
-        // para entrar. Asegúrate de usar mayúsculas y sin tildes para evitar errores.
-        // =========================================================================
+        // ==========================================
+        // 1. BASE DE DATOS DE USUARIOS
+        // ==========================================
         const usersDB = {
-            "JUAN PEREZ": {
-                id: "JUAN PEREZ",
-                horas: 14,
-                plataforma: "NETFLIX / MAX",
-                genero: "TERROR",
-                dispositivo: "CELULAR",
-                barcodeNum: "8 07028 75001 2"
-            },
-            "MARIA GOMEZ": {
-                id: "MARIA GOMEZ",
-                horas: 20,
-                plataforma: "DISNEY+",
-                genero: "ANIMACIÓN",
-                dispositivo: "SMART TV",
-                barcodeNum: "8 07028 34091 5"
-            },
-            "CARLOS RUIZ": {
-                id: "CARLOS RUIZ",
-                horas: 8,
-                plataforma: "AMAZON PRIME",
-                genero: "ACCIÓN",
-                dispositivo: "LAPTOP",
-                barcodeNum: "8 07028 11200 9"
-            }
-            // Agrega aquí los 19 compañeros restantes siguiendo la misma estructura.
-            // "NOMBRE APELLIDO": { id: "NOMBRE", horas: X, plataforma: "X", genero: "X", dispositivo: "X", barcodeNum: "X" }
+            "USER-01": { nombre: "JHON QUINTERO", horas: "14", plataforma: "NETFLIX / MAX", genero: "TERROR", dispositivo: "CELULAR" },
+            "USER-02": { nombre: "EDGAR GORDILLO", horas: "10", plataforma: "AMAZON PRIME", genero: "COMEDIA", dispositivo: "TV" },
+            "USER-03": { nombre: "MARIA GOMEZ", horas: "20", plataforma: "DISNEY+", genero: "DRAMA", dispositivo: "TABLET" }
+            // AÑADE MÁS COMPAÑEROS AQUÍ
         };
 
         let currentUser = null;
 
-        function showMessage(msg) {
-            const box = document.getElementById('alertBox');
-            box.innerText = msg;
-            box.style.display = 'block';
-            setTimeout(() => { box.style.display = 'none'; }, 3000);
-        }
-
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-' + screenId).classList.add('active');
-            window.scrollTo(0,0);
+            document.getElementById(screenId).classList.add('active');
         }
 
-        function intentarLogin() {
-            // Convierte todo a mayúsculas y quita tildes para facilitar el ingreso
-            let input = document.getElementById('user-code').value.trim().toUpperCase();
-            input = input.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-            if(input === '') {
-                showMessage("Por favor ingresa tu nombre.");
-                return;
-            }
+        // ==========================================
+        // LOGIN
+        // ==========================================
+        function iniciarSesion() {
+            let inputId = document.getElementById('username').value.trim().toUpperCase();
             
-            if(usersDB[input]) {
-                currentUser = usersDB[input];
-                iniciarMinijuegoMemoria();
-                showScreen('game1');
+            let userFound = false;
+            if(usersDB[inputId]) {
+                currentUser = usersDB[inputId];
+                userFound = true;
             } else {
-                showMessage("Nombre no encontrado en la base de datos de la muestra.");
+                for (let key in usersDB) {
+                    if (usersDB[key].nombre.toUpperCase() === inputId) {
+                        currentUser = usersDB[key];
+                        userFound = true;
+                        break;
+                    }
+                }
+            }
+
+            if (userFound) {
+                document.getElementById('error-msg').innerText = "";
+                showScreen('screen-level1');
+                iniciarMinijuegoMemoria();
+            } else {
+                document.getElementById('error-msg').innerText = "Usuario no encontrado. Revisa la ortografía.";
             }
         }
 
-        document.getElementById('user-code').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') intentarLogin();
-        });
-
+        // ==========================================
+        // NIVEL 1: MEMORIA (8 Pares / 4x4)
+        // ==========================================
         let flippedCards = [];
         let matchedPairs = 0;
-        const totalPairs = 8;
+        const totalPairs = 8; 
 
         function iniciarMinijuegoMemoria() {
             const board = document.getElementById('memory-board');
             board.innerHTML = '';
-            flippedCards = [];
             matchedPairs = 0;
-            document.getElementById('memory-success').classList.add('hidden');
-            document.getElementById('btn-next-game1').classList.add('hidden');
-
-            // 8 íconos diferentes de FontAwesome relacionados al diseño y entretenimiento
-            const icons = [
-                'fa-film', 'fa-tv', 'fa-video', 'fa-ticket-alt', 
-                'fa-star', 'fa-headphones', 'fa-couch', 'fa-mask'
-            ];
+            flippedCards = [];
             
-            let deck = [...icons, ...icons];
-            // Barajar
-            deck.sort(() => Math.random() - 0.5);
+            const icons = ['🎬','🍿','🎫','🎥','🎞️','⭐','🎭','📽️'];
+            let cards = [...icons, ...icons];
+            
+            cards.sort(() => 0.5 - Math.random());
 
-            deck.forEach((icon, index) => {
-                const card = document.createElement('div');
-                card.className = 'memory-card';
+            cards.forEach((icon) => {
+                let card = document.createElement('div');
+                card.classList.add('card');
                 card.dataset.icon = icon;
-                card.innerHTML = `
-                    <div class="memory-card-face memory-card-front"><i class="fas fa-question text-gray-400 text-xl md:text-2xl"></i></div>
-                    <div class="memory-card-face memory-card-back"><i class="fas ${icon} text-xl md:text-2xl"></i></div>
-                `;
+                card.innerHTML = `<span class="card-hidden">${icon}</span>`;
                 card.onclick = () => flipCard(card);
                 board.appendChild(card);
             });
         }
 
         function flipCard(card) {
-            if (flippedCards.length >= 2 || card.classList.contains('flipped')) return;
-            
-            card.classList.add('flipped');
-            flippedCards.push(card);
+            if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+                card.classList.add('flipped');
+                card.querySelector('span').classList.remove('card-hidden');
+                flippedCards.push(card);
 
-            if (flippedCards.length === 2) {
-                setTimeout(checkMatch, 800);
+                if (flippedCards.length === 2) {
+                    setTimeout(checkMatch, 800);
+                }
             }
         }
 
@@ -528,226 +411,198 @@
             if (card1.dataset.icon === card2.dataset.icon) {
                 matchedPairs++;
                 if (matchedPairs === totalPairs) {
-                    document.getElementById('memory-success').classList.remove('hidden');
-                    document.getElementById('btn-next-game1').classList.remove('hidden');
+                    document.getElementById('btn-next-level1').style.display = 'block';
                 }
             } else {
                 card1.classList.remove('flipped');
                 card2.classList.remove('flipped');
+                card1.querySelector('span').classList.add('card-hidden');
+                card2.querySelector('span').classList.add('card-hidden');
             }
             flippedCards = [];
         }
 
-        let puzzleState = [0, 1, 2, 3, 4, 5, 6, 7, 8]; // 8 es el espacio vacío
-        const solvedState = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        // ==========================================
+        // NIVEL 2: ROMPECABEZAS SLIDER (3x3)
+        // ==========================================
+        let puzzleTiles = [];
+        const puzzleSize = 3;
 
-        function iniciarPuzzle() {
-            // Reiniciar estado
-            puzzleState = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-            let emptyIdx = 8;
+        function iniciarNivel2() {
+            showScreen('screen-level2');
+            initPuzzle();
+        }
+
+        function initPuzzle() {
+            puzzleTiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+            let emptyIndex = 8;
             
-            // Mezclar haciendo 150 movimientos válidos para asegurar que siempre tenga solución real
-            for(let i=0; i<150; i++) {
-                const validMoves = [];
-                const row = Math.floor(emptyIdx / 3);
-                const col = emptyIdx % 3;
-                if(row > 0) validMoves.push(emptyIdx - 3); // Arriba
-                if(row < 2) validMoves.push(emptyIdx + 3); // Abajo
-                if(col > 0) validMoves.push(emptyIdx - 1); // Izquierda
-                if(col < 2) validMoves.push(emptyIdx + 1); // Derecha
+            // Mezclar haciendo 50 movimientos legales
+            for(let i = 0; i < 50; i++) {
+                let validMoves = [];
+                let row = Math.floor(emptyIndex / puzzleSize);
+                let col = emptyIndex % puzzleSize;
                 
-                const move = validMoves[Math.floor(Math.random() * validMoves.length)];
-                puzzleState[emptyIdx] = puzzleState[move];
-                puzzleState[move] = 8;
-                emptyIdx = move;
+                if(row > 0) validMoves.push(emptyIndex - puzzleSize); 
+                if(row < puzzleSize - 1) validMoves.push(emptyIndex + puzzleSize); 
+                if(col > 0) validMoves.push(emptyIndex - 1); 
+                if(col < puzzleSize - 1) validMoves.push(emptyIndex + 1); 
+                
+                let randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+                [puzzleTiles[emptyIndex], puzzleTiles[randomMove]] = [puzzleTiles[randomMove], puzzleTiles[emptyIndex]];
+                emptyIndex = randomMove;
             }
-            
             renderPuzzle();
-            document.getElementById('puzzle-success').classList.add('hidden');
-            document.getElementById('btn-next-puzzle').classList.add('hidden');
         }
 
         function renderPuzzle() {
             const board = document.getElementById('puzzle-board');
             board.innerHTML = '';
-            puzzleState.forEach((val, index) => {
-                const tile = document.createElement('div');
-                tile.className = 'puzzle-tile' + (val === 8 ? ' empty' : '');
+            
+            puzzleTiles.forEach((tileValue, index) => {
+                let tile = document.createElement('div');
+                tile.classList.add('puzzle-tile');
                 
-                if(val !== 8) {
-                    // Calculamos la porción de imagen correcta para cada cuadro usando porcentajes css
-                    const bgX = (val % 3) * 50;
-                    const bgY = Math.floor(val / 3) * 50;
-                    tile.style.backgroundSize = '300% 300%';
-                    tile.style.backgroundPosition = `${bgX}% ${bgY}%`;
+                if (tileValue === 8) {
+                    tile.classList.add('puzzle-empty');
+                } else {
+                    let origRow = Math.floor(tileValue / puzzleSize);
+                    let origCol = tileValue % puzzleSize;
+                    tile.style.backgroundPosition = `-${origCol * 100}px -${origRow * 100}px`;
+                    tile.innerText = tileValue + 1; // Números de ayuda
                 }
-                
-                tile.onclick = () => moveTile(index);
+
+                tile.onclick = () => movePuzzleTile(index);
                 board.appendChild(tile);
             });
+            checkPuzzleWin();
         }
 
-        function moveTile(index) {
-            const emptyIdx = puzzleState.indexOf(8);
-            const row1 = Math.floor(index / 3), col1 = index % 3;
-            const row2 = Math.floor(emptyIdx / 3), col2 = emptyIdx % 3;
-            
-            // Verificar si la ficha clickeada está justo al lado del espacio vacío
-            if(Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1) {
-                puzzleState[emptyIdx] = puzzleState[index];
-                puzzleState[index] = 8;
+        function movePuzzleTile(index) {
+            let emptyIndex = puzzleTiles.indexOf(8);
+            let row = Math.floor(index / puzzleSize);
+            let col = index % puzzleSize;
+            let emptyRow = Math.floor(emptyIndex / puzzleSize);
+            let emptyCol = emptyIndex % puzzleSize;
+
+            let isAdjacent = (Math.abs(row - emptyRow) === 1 && col === emptyCol) || 
+                             (Math.abs(col - emptyCol) === 1 && row === emptyRow);
+
+            if (isAdjacent) {
+                [puzzleTiles[index], puzzleTiles[emptyIndex]] = [puzzleTiles[emptyIndex], puzzleTiles[index]];
                 renderPuzzle();
-                checkPuzzleWin();
             }
         }
 
         function checkPuzzleWin() {
-            if(puzzleState.join(',') === solvedState.join(',')) {
-                document.getElementById('puzzle-success').classList.remove('hidden');
-                document.getElementById('btn-next-puzzle').classList.remove('hidden');
+            let isWin = true;
+            for(let i=0; i < puzzleTiles.length; i++) {
+                if(puzzleTiles[i] !== i) {
+                    isWin = false;
+                    break;
+                }
+            }
+            if(isWin) {
+                document.getElementById('puzzle-board').style.border = "4px solid #4CAF50";
+                document.getElementById('btn-next-level2').style.display = 'block';
             }
         }
 
-        function siguienteNivel(nivel) {
-            if (nivel === 'game-puzzle') {
-                iniciarPuzzle();
-                showScreen('game-puzzle');
-            } else if (nivel === 'game-trivia') {
-                currentQuestion = 0;
-                cargarPregunta();
-                showScreen('game-trivia');
-            }
-        }
-
-        // Preguntas 100% verídicas de diseño y analítica
-        const preguntasTrivia = [
+        // ==========================================
+        // NIVEL 3: TRIVIA
+        // ==========================================
+        const triviaData = [
             {
                 q: "1. En un proyecto de identidad visual, ¿qué decisión tendría mayor impacto en la percepción de confianza y profesionalismo de una marca financiera?",
                 options: [
-                    "Utilizar colores cálidos y tipografías manuscritas.",
-                    "Emplear una paleta cromática sobria y tipografías de alta legibilidad.",
-                    "Incluir una gran cantidad de elementos decorativos.",
-                    "Priorizar ilustraciones abstractas sobre la claridad del mensaje."
+                    "A) Utilizar colores cálidos y tipografías manuscritas.",
+                    "B) Emplear una paleta cromática sobria y tipografías de alta legibilidad.",
+                    "C) Incluir una gran cantidad de elementos decorativos.",
+                    "D) Priorizar ilustraciones abstractas sobre la claridad del mensaje."
                 ],
-                ans: 1 
+                correct: 1
             },
             {
                 q: "2. Según los principios de la Gestalt, cuando un diseñador organiza varios elementos cercanos entre sí para que sean percibidos como un grupo, está aplicando el principio de:",
                 options: [
-                    "Figura y fondo.",
-                    "Continuidad.",
-                    "Proximidad.",
-                    "Simetría."
+                    "A) Figura y fondo.",
+                    "B) Continuidad.",
+                    "C) Proximidad.",
+                    "D) Simetría."
                 ],
-                ans: 2
+                correct: 2
             },
             {
                 q: "3. Un diseñador desarrolla una infografía visualmente atractiva, pero los usuarios no logran identificar la información principal. ¿Cuál es el problema de diseño más probable?",
                 options: [
-                    "Exceso de contraste visual.",
-                    "Falta de jerarquía visual.",
-                    "Uso incorrecto del espacio negativo.",
-                    "Aplicación excesiva de retículas."
+                    "A) Exceso de contraste visual.",
+                    "B) Falta de jerarquía visual.",
+                    "C) Uso incorrecto del espacio negativo.",
+                    "D) Aplicación excesiva de retículas."
                 ],
-                ans: 1
+                correct: 1
             }
         ];
-        
+
         let currentQuestion = 0;
 
-        function cargarPregunta() {
-            const qObj = preguntasTrivia[currentQuestion];
-            document.getElementById('trivia-counter').innerText = `PREGUNTA ${currentQuestion + 1}/${preguntasTrivia.length}`;
-            document.getElementById('trivia-question').innerText = qObj.q;
+        function iniciarNivel3() {
+            showScreen('screen-level3');
+            currentQuestion = 0;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const qData = triviaData[currentQuestion];
+            document.getElementById('question-text').innerText = qData.q;
             
-            const optionsContainer = document.getElementById('trivia-options');
-            optionsContainer.innerHTML = '';
-            
-            qObj.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                // Estilos modificados para permitir un ícono de feedback a la derecha
-                btn.className = "w-full bg-gray-700 hover:bg-[var(--accent-gold)] hover:text-black text-white py-3 px-4 rounded text-left transition-all font-sans border border-gray-600 text-lg flex justify-between items-center";
-                btn.innerHTML = `<span class="flex-grow pr-4">${opt}</span> <span class="feedback-icon hidden text-2xl font-bold flex-shrink-0"></span>`;
-                
-                // Pasamos 'this' (el botón) a la función para modificar sus estilos
-                btn.onclick = function() { responderTrivia(index, this); };
-                optionsContainer.appendChild(btn);
+            const optionsBoard = document.getElementById('options-board');
+            optionsBoard.innerHTML = '';
+
+            qData.options.forEach((opt, index) => {
+                let btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = (e) => checkAnswer(index, btn);
+                optionsBoard.appendChild(btn);
             });
         }
 
-        function responderTrivia(index, btnElement) {
-            const correctIndex = preguntasTrivia[currentQuestion].ans;
-            const iconSpan = btnElement.querySelector('.feedback-icon');
-            
-            if (index !== correctIndex) {
-                // Feedback visual de error
-                btnElement.classList.remove('hover:bg-[var(--accent-gold)]', 'hover:text-black', 'bg-gray-700');
-                btnElement.classList.add('bg-red-900', 'border-red-500', 'text-white');
-                iconSpan.innerHTML = '<i class="fas fa-times text-red-500"></i>';
-                iconSpan.classList.remove('hidden');
-                
-                // Efecto de vibración leve
-                btnElement.animate([
-                    { transform: 'translateX(0px)' },
-                    { transform: 'translateX(-6px)' },
-                    { transform: 'translateX(6px)' },
-                    { transform: 'translateX(-6px)' },
-                    { transform: 'translateX(0px)' }
-                ], { duration: 300 });
+        function checkAnswer(selectedIndex, btnElement) {
+            const correctIndex = triviaData[currentQuestion].correct;
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
 
-                showMessage("Respuesta incorrecta. ¡Inténtalo de nuevo con otra opción!");
-                return; // Obliga a acertar para avanzar
+            if (selectedIndex === correctIndex) {
+                btnElement.classList.add('correct-answer');
+                setTimeout(() => {
+                    currentQuestion++;
+                    if (currentQuestion < triviaData.length) {
+                        loadQuestion();
+                    } else {
+                        mostrarResultados();
+                    }
+                }, 1000);
+            } else {
+                btnElement.classList.add('wrong-answer');
+                setTimeout(() => {
+                    btnElement.classList.remove('wrong-answer');
+                    allBtns.forEach(b => b.disabled = false);
+                }, 800);
             }
-
-            // Feedback visual de acierto
-            btnElement.classList.remove('hover:bg-[var(--accent-gold)]', 'hover:text-black', 'bg-gray-700');
-            btnElement.classList.add('bg-green-800', 'border-green-500', 'text-white');
-            iconSpan.innerHTML = '<i class="fas fa-check text-green-400"></i>';
-            iconSpan.classList.remove('hidden');
-
-            // Pequeña pausa para que el jugador vea que acertó antes de avanzar
-            setTimeout(() => {
-                currentQuestion++;
-                if (currentQuestion < preguntasTrivia.length) {
-                    cargarPregunta();
-                } else {
-                    generarTicket();
-                    showScreen('results');
-                }
-            }, 800);
         }
 
-        function generarTicket() {
-            if(!currentUser) return;
-
-            document.getElementById('t-user').innerText = currentUser.id;
+        // ==========================================
+        // RESULTADOS FINALES
+        // ==========================================
+        function mostrarResultados() {
+            showScreen('screen-results');
+            document.getElementById('t-name').innerText = currentUser.nombre;
             document.getElementById('t-hours').innerText = currentUser.horas;
-            document.getElementById('t-genre').innerText = currentUser.genero;
             document.getElementById('t-platform').innerText = currentUser.plataforma;
+            document.getElementById('t-genre').innerText = currentUser.genero;
             document.getElementById('t-device').innerText = currentUser.dispositivo;
-            document.getElementById('t-barcode-text').innerText = currentUser.barcodeNum;
-
-            // Gráfica de barras de horas visual (Máx ~30h para el cálculo)
-            const barsContainer = document.getElementById('t-hours-bars');
-            barsContainer.innerHTML = '';
-            for(let i=0; i<5; i++){
-                let heightClass = '';
-                let fillClass = 'bg-black';
-                let threshold = (currentUser.horas / 30) * 5; 
-                if(i < threshold) heightClass = 'h-full';
-                else if (i - threshold < 0.5) heightClass = 'h-1/2';
-                else { heightClass = 'h-1/3'; fillClass = 'bg-gray-400'; }
-                
-                barsContainer.innerHTML += `<div class="w-1.5 ${fillClass} ${heightClass}"></div>`;
-            }
         }
-
-        function reiniciarExperiencia() {
-            currentUser = null;
-            document.getElementById('user-code').value = '';
-            showScreen('login');
-        }
-
     </script>
 </body>
 </html>
