@@ -1,3 +1,11 @@
+¡Hecho! He integrado tu base de datos completa con nombres y apellidos, vinculado los datos del ticket para cada uno, y hemos vuelto dinámica la caja de palomitas (conclusiones) para que cada persona vea su análisis personalizado.   
+DOCX
+
+También he actualizado la pantalla de inicio para que la instrucción y el ejemplo indiquen claramente que deben ingresar sus "Nombres y apellidos completos".
+
+Borra todo el contenido de tu archivo y pega este código definitivo:
+
+HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -267,13 +275,13 @@
 
             <!-- Tarjeta oscura de Login -->
             <div style="background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); max-width: 400px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                <h3 style="margin-top: 0; font-size: 1.5rem; letter-spacing: 1px; color: #f9fafb; font-family: 'Oswald', sans-serif; text-transform: uppercase;">FRASE SECRETA</h3>
+                <h3 style="margin-top: 0; font-size: 1.5rem; letter-spacing: 1px; color: #f9fafb; font-family: 'Oswald', sans-serif; text-transform: uppercase;">VALIDACIÓN DE DATOS</h3>
                 <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; font-family: sans-serif; line-height: 1.4;">
-                    Para generar tu ticket y ver tus resultados, por favor ingresa la frase mágica para acceder.
+                    Para generar tu ticket y ver tus resultados, por favor ingresa tus nombres y apellidos completos.
                 </p>
                 
                 <div class="input-group" style="margin: 0;">
-                    <input type="text" id="username" placeholder="EJ: MARIANA VAS A GANAR" autocomplete="off" 
+                    <input type="text" id="username" placeholder="EJ: NOMBRES Y APELLIDOS COMPLETOS" autocomplete="off" 
                            style="width: 100%; box-sizing: border-box; background: var(--bg-dark); border: 1px solid var(--border-color); margin-bottom: 10px; color: #f9fafb; padding: 15px; font-size: 1rem; text-align: center; border-radius: 8px; font-family: 'Courier Prime', monospace; text-transform: uppercase; outline: none; transition: border 0.3s;">
                     <div id="error-msg"></div>
                 </div>
@@ -328,13 +336,11 @@
                 <div class="barcode"></div>
             </div>
 
-            <!-- CAJA DE PALOMITAS (CONCLUSIONES) -->
+            <!-- CAJA DE PALOMITAS (CONCLUSIONES DINÁMICAS) -->
             <div class="popcorn-box">
                 <div class="popcorn-title">🍿 CONCLUSIONES DEL ESTUDIO</div>
-                <div class="popcorn-content">
-                    <p><strong>1. El streaming domina:</strong> La mayoría de los encuestados prefieren plataformas de streaming sobre medios tradicionales, priorizando la visualización en dispositivos móviles.</p>
-                    <p><strong>2. Consumo fragmentado:</strong> Las series ganan frente a las películas debido a la flexibilidad de tiempo de los estudiantes universitarios de diseño.</p>
-                    <p><strong>3. Horarios nocturnos:</strong> El pico de consumo audiovisual se concentra entre las 8:00 PM y las 11:00 PM, funcionando como método de desconexión.</p>
+                <div class="popcorn-content" id="popcorn-content">
+                    <!-- El contenido se inyectará dinámicamente aquí según el usuario -->
                 </div>
             </div>
             
@@ -345,12 +351,129 @@
 
     <script>
         // ==========================================
-        // 1. BASE DE DATOS DE USUARIOS
+        // 1. BASE DE DATOS DE USUARIOS (DATOS 100% REALES)
         // ==========================================
         const usersDB = {
-            "USER-01": { nombre: "JHON QUINTERO", horas: "14", plataforma: "NETFLIX / MAX", genero: "TERROR", dispositivo: "CELULAR" },
-            "USER-02": { nombre: "EDGAR GORDILLO", horas: "10", plataforma: "AMAZON PRIME", genero: "COMEDIA", dispositivo: "TV" },
-            "USER-03": { nombre: "MARIA GOMEZ", horas: "20", plataforma: "DISNEY+", genero: "DRAMA", dispositivo: "TABLET" }
+            "MARIANA VAS A GANAR": { 
+                nombre: "MARIANA", horas: "18", plataforma: "NETFLIX / MAX", genero: "VARIADO", dispositivo: "CELULAR / PC",
+                c1: "<strong>El streaming domina:</strong> La mayoría de los encuestados prefieren plataformas de streaming sobre medios tradicionales, priorizando la visualización en dispositivos móviles.",
+                c2: "<strong>Consumo fragmentado:</strong> Las series ganan frente a las películas debido a la flexibilidad de tiempo de los estudiantes universitarios de diseño.",
+                c3: "<strong>Horarios nocturnos:</strong> El pico de consumo audiovisual se concentra entre las 8:00 PM y las 11:00 PM, funcionando como método de desconexión."
+            },
+            "SOFIA RODRIGUEZ ESTUPIÑAN": {
+                nombre: "SOFIA", horas: "8 a 14", plataforma: "DISNEY+ / STAR+", genero: "COMEDIA", dispositivo: "CELULAR",
+                c1: "<strong>Hábitos de visualización:</strong> Dedicas entre 8 y 14 horas a ver contenido, concentrando tus sesiones principalmente entre semana en la tarde.",
+                c2: "<strong>Perfil móvil y flexible:</strong> Tu dispositivo preferido es el teléfono móvil, usándolo como medio principal para disfrutar películas a través de Disney+ / Star+.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Comedia y Animación / Anime. Al elegir, tu factor más importante es el estado de ánimo del momento."
+            },
+            "SALLY": {
+                nombre: "SALLY", horas: "+14", plataforma: "XUPER", genero: "COMEDIA", dispositivo: "SMART TV",
+                c1: "<strong>Consumo intensivo:</strong> Dedicas más de 14 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la tarde.",
+                c2: "<strong>Experiencia de pantalla grande:</strong> Tu dispositivo preferido es el Smart TV / televisor, usándolo como medio principal para disfrutar películas y series por igual a través de Xuper.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Comedia, Drama, Ciencia Ficción y Romance. Al elegir, tu factor más importante son las recomendaciones en redes sociales."
+            },
+            "LUNA ANDREA CARRANZA ARISTIZABAL": {
+                nombre: "LUNA", horas: "+14", plataforma: "NETFLIX", genero: "CIENCIA FICCIÓN", dispositivo: "PC",
+                c1: "<strong>Consumo intensivo:</strong> Dedicas más de 14 horas a ver contenido, concentrando tus sesiones por igual durante toda la semana en la tarde.",
+                c2: "<strong>Consumo en escritorio:</strong> Tu dispositivo preferido es el computador portátil o de escritorio, usándolo como medio principal para disfrutar series (capítulos/temporadas) a través de Netflix.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Ciencia Ficción y Animación / Anime. Al elegir, tu factor más importante es la duración del contenido."
+            },
+            "ANDREA VALENTINA COLORADO SANDOVAL": {
+                nombre: "ANDREA", horas: "<3", plataforma: "PRIME VIDEO", genero: "ACCIÓN", dispositivo: "SMART TV",
+                c1: "<strong>Consumo ligero:</strong> Dedicas menos de 3 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la noche.",
+                c2: "<strong>Experiencia de pantalla grande:</strong> Tu dispositivo preferido es el Smart TV / televisor, usándolo como medio principal para disfrutar series (capítulos/temporadas) a través de Prime Video.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Acción / Aventura y Documentales. Al elegir, tu factor más importante son las recomendaciones en redes sociales."
+            },
+            "MARIA FERNANDA MILLAN GRANADOS": {
+                nombre: "MARIA", horas: "3 a 7", plataforma: "APPLE TV", genero: "DRAMA", dispositivo: "SMART TV",
+                c1: "<strong>Hábitos de visualización:</strong> Dedicas entre 3 y 7 horas a ver contenido, concentrando tus sesiones por igual durante toda la semana en la noche.",
+                c2: "<strong>Experiencia de pantalla grande:</strong> Tu dispositivo preferido es el Smart TV / televisor, usándolo como medio principal para disfrutar películas y series por igual a través de Apple TV.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Drama y Ciencia Ficción. Al elegir, tu factor más importante son las tendencias y el algoritmo de la plataforma."
+            },
+            "MIGUEL ANGEL ROJAS NEISA": {
+                nombre: "MIGUEL", horas: "<3", plataforma: "WEB NO OFICIAL", genero: "CIENCIA FICCIÓN", dispositivo: "PC",
+                c1: "<strong>Consumo ligero:</strong> Dedicas menos de 3 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la noche.",
+                c2: "<strong>Consumo en escritorio:</strong> Tu dispositivo preferido es el computador portátil o de escritorio, usándolo como medio principal para disfrutar series a través de páginas no oficiales / piratería online.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Ciencia Ficción y Animación / Anime. Al elegir, tu factor más importante son las recomendaciones en redes sociales."
+            },
+            "LAURA SOFÍA GONZÁLEZ ZAPATA": {
+                nombre: "LAURA", horas: "<3", plataforma: "YOUTUBE", genero: "CIENCIA FICCIÓN", dispositivo: "CELULAR",
+                c1: "<strong>Consumo ligero:</strong> Dedicas menos de 3 horas a ver contenido, concentrando tus sesiones por igual durante toda la semana en la tarde.",
+                c2: "<strong>Perfil móvil y flexible:</strong> Tu dispositivo preferido es el teléfono móvil, usándolo como medio principal para disfrutar películas y series por igual a través de YouTube / plataformas gratuitas.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Ciencia Ficción y Animación / Anime. Al elegir, tu factor más importante es el estado de ánimo del momento."
+            },
+            "KAREN JULIETH GARCIA VARGAS": {
+                nombre: "KAREN", horas: "<3", plataforma: "NETFLIX", genero: "ACCIÓN", dispositivo: "SMART TV",
+                c1: "<strong>Consumo ligero:</strong> Dedicas menos de 3 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la madrugada.",
+                c2: "<strong>Experiencia de pantalla grande:</strong> Tu dispositivo preferido es el Smart TV / televisor, usándolo como medio principal para disfrutar películas a través de Netflix.",
+                c3: "<strong>Patrón de elección:</strong> Tienes gustos muy variados (Acción, Comedia, Drama, Ciencia Ficción, Terror, Romance). Al elegir, tu factor más importante es la duración del contenido."
+            },
+            "LEIDY MAYERLY DÍAZ MOJICA": {
+                nombre: "LEIDY", horas: "3 a 7", plataforma: "NETFLIX", genero: "ACCIÓN", dispositivo: "CELULAR",
+                c1: "<strong>Hábitos de visualización:</strong> Dedicas entre 3 y 7 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la noche.",
+                c2: "<strong>Perfil móvil y flexible:</strong> Tu dispositivo preferido es el teléfono móvil, usándolo como medio principal para disfrutar películas y series por igual a través de Netflix.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros de Acción / Aventura. Al elegir, tu factor más importante son las recomendaciones de amigos o familiares."
+            },
+            "MARTÍN ALEJANDRO LIZCANO MARTINEZ": {
+                nombre: "MARTÍN", horas: "3 a 7", plataforma: "NETFLIX", genero: "CIENCIA FICCIÓN", dispositivo: "SMART TV",
+                c1: "<strong>Hábitos de visualización:</strong> Dedicas entre 3 y 7 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la noche.",
+                c2: "<strong>Experiencia de pantalla grande:</strong> Tu dispositivo preferido es el Smart TV / televisor, usándolo como medio principal para disfrutar películas y series por igual a través de Netflix.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Ciencia Ficción y Animación / Anime. Al elegir, tu factor más importante es el estado de ánimo del momento."
+            },
+            "ROSSANA TOVAR BUITRAGO": {
+                nombre: "ROSSANA", horas: "<3", plataforma: "NETFLIX", genero: "ACCIÓN", dispositivo: "SMART TV",
+                c1: "<strong>Consumo ligero:</strong> Dedicas menos de 3 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la noche.",
+                c2: "<strong>Experiencia de pantalla grande:</strong> Tu dispositivo preferido es el Smart TV / televisor, usándolo como medio principal para disfrutar series a través de Netflix.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Acción / Aventura y Ciencia Ficción. Al elegir, tu factor más importante son las tendencias y el algoritmo de la plataforma."
+            },
+            "SOFIA BEJARANO GAMEZ": {
+                nombre: "SOFIA B.", horas: "8 a 14", plataforma: "WEB NO OFICIAL", genero: "CIENCIA FICCIÓN", dispositivo: "SMART TV",
+                c1: "<strong>Hábitos de visualización:</strong> Dedicas entre 8 y 14 horas a ver contenido, concentrando tus sesiones por igual durante toda la semana en la noche.",
+                c2: "<strong>Experiencia de pantalla grande:</strong> Tu dispositivo preferido es el Smart TV / televisor, usándolo como medio principal para disfrutar películas y series por igual a través de páginas no oficiales / piratería online.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros de Ciencia Ficción / Fantasía. Al elegir, tu factor más importante es el estado de ánimo del momento."
+            },
+            "MELANIE SHIRLEY QUINTERO MUÑOZ": {
+                nombre: "MELANIE", horas: "8 a 14", plataforma: "DISNEY+ / STAR+", genero: "TERROR", dispositivo: "CELULAR",
+                c1: "<strong>Hábitos de visualización:</strong> Dedicas entre 8 y 14 horas a ver contenido, concentrando tus sesiones por igual durante toda la semana en la tarde.",
+                c2: "<strong>Perfil móvil y flexible:</strong> Tu dispositivo preferido es el teléfono móvil, usándolo como medio principal para disfrutar películas a través de Disney+ / Star+.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros de Terror / Suspenso. Al elegir, tu factor más importante es el estado de ánimo del momento."
+            },
+            "DANIEL DAVID ROA DAZA": {
+                nombre: "DANIEL", horas: "<3", plataforma: "MAX (HBO)", genero: "CIENCIA FICCIÓN", dispositivo: "PC",
+                c1: "<strong>Consumo ligero:</strong> Dedicas menos de 3 horas a ver contenido, concentrando tus sesiones principalmente entre semana en la madrugada.",
+                c2: "<strong>Consumo en escritorio:</strong> Tu dispositivo preferido es el computador portátil o de escritorio, usándolo como medio principal para disfrutar películas a través de Max (HBO).",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Ciencia Ficción y Documentales. Al elegir, tu factor más importante es el estado de ánimo del momento."
+            },
+            "SARA SOFIA VEGA FORERO": {
+                nombre: "SARA", horas: "3 a 7", plataforma: "WEB NO OFICIAL", genero: "COMEDIA", dispositivo: "TABLET",
+                c1: "<strong>Hábitos de visualización:</strong> Dedicas entre 3 y 7 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la tarde.",
+                c2: "<strong>Ecosistema digital:</strong> Tu dispositivo preferido es la tablet, usándolo como medio principal para disfrutar series a través de páginas no oficiales / piratería online.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Comedia y Animación / Anime. Al elegir, tu factor más importante son las recomendaciones de amigos o familiares."
+            },
+            "SEBASTIÁN ANDRES TRUJILLO LASCANO": {
+                nombre: "SEBASTIÁN", horas: "8 a 14", plataforma: "TODOS", genero: "CIENCIA FICCIÓN", dispositivo: "CELULAR",
+                c1: "<strong>Hábitos de visualización:</strong> Dedicas entre 8 y 14 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la madrugada.",
+                c2: "<strong>Perfil móvil y flexible:</strong> Tu dispositivo preferido es el teléfono móvil, usándolo como medio principal para disfrutar películas y series por igual a través de múltiples plataformas.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Ciencia Ficción y Animación / Anime. Al elegir, tu factor más importante es el estado de ánimo del momento."
+            },
+            "JAVIER MEZA": {
+                nombre: "JAVIER", horas: "<3", plataforma: "MAX (HBO)", genero: "ACCIÓN", dispositivo: "PC",
+                c1: "<strong>Consumo ligero:</strong> Dedicas menos de 3 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la noche.",
+                c2: "<strong>Consumo en escritorio:</strong> Tu dispositivo preferido es el computador portátil o de escritorio, usándolo como medio principal para disfrutar películas a través de Max (HBO).",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Acción / Aventura y Ciencia Ficción. Al elegir, tu factor más importante es la duración del contenido."
+            },
+            "JHON QUINTERO": {
+                nombre: "JHON", horas: "<3", plataforma: "YOUTUBE", genero: "DOCUMENTAL", dispositivo: "SMART TV",
+                c1: "<strong>Consumo ligero:</strong> Dedicas menos de 3 horas a ver contenido, concentrando tus sesiones principalmente los fines de semana en la mañana.",
+                c2: "<strong>Experiencia de pantalla grande:</strong> Tu dispositivo preferido es el Smart TV / televisor, usándolo como medio principal para disfrutar películas a través de YouTube / plataformas gratuitas.",
+                c3: "<strong>Patrón de elección:</strong> Te inclinas por géneros como Documental / Basado en hechos reales. Al elegir, tu factor más importante es el estado de ánimo del momento."
+            },
+            "ANDRES FERNANDO GALINDO ACERO": {
+                nombre: "ANDRES", horas: "+10", plataforma: "FUTBOL LIBRE / TV", genero: "DEPORTES", dispositivo: "PANTALLA GIGANTE",
+                c1: "<strong>Consumo excesivo:</strong> Dedica mas de 10 horas al día para ver futbol.",
+                c2: "<strong>Experiencia de pantalla grande:</strong> Le gusta ver partidos en bares.",
+                c3: "<strong>Patron de elección:</strong> Le gusta el futbol de Inglaterra."
+            }
         };
 
         let currentUser = null;
@@ -361,48 +484,26 @@
         }
 
         // ==========================================
-        // LOGIN CON FRASE SECRETA
+        // LOGIN CON VALIDACIÓN DE USUARIO REAL
         // ==========================================
         function iniciarSesion() {
-            let inputId = document.getElementById('username').value.trim().toLowerCase();
+            // Remueve espacios al inicio/final, dobles espacios entre palabras y pasa a mayúsculas
+            let inputId = document.getElementById('username').value.trim().replace(/\s+/g, ' ').toUpperCase();
             
-            // Validación única de la frase secreta
-            if(inputId === "mariana vas a ganar") {
-                currentUser = { 
-                    nombre: "MARIANA", 
-                    horas: "18", 
-                    plataforma: "NETFLIX / MAX", 
-                    genero: "VARIADO", 
-                    dispositivo: "CELULAR / PC" 
-                };
-                document.getElementById('error-msg').innerText = "";
-                showScreen('screen-level1');
-                iniciarMinijuegoMemoria();
-                return;
-            }
-
-            // Fallback para otros usuarios
-            let inputIdUpper = inputId.toUpperCase();
             let userFound = false;
-            if(usersDB[inputIdUpper]) {
-                currentUser = usersDB[inputIdUpper];
+            
+            // Buscar coincidencia exacta en la base de datos
+            if(usersDB[inputId]) {
+                currentUser = usersDB[inputId];
                 userFound = true;
-            } else {
-                for (let key in usersDB) {
-                    if (usersDB[key].nombre.toUpperCase() === inputIdUpper) {
-                        currentUser = usersDB[key];
-                        userFound = true;
-                        break;
-                    }
-                }
-            }
+            } 
 
             if (userFound) {
                 document.getElementById('error-msg').innerText = "";
                 showScreen('screen-level1');
                 iniciarMinijuegoMemoria();
             } else {
-                document.getElementById('error-msg').innerText = "Frase secreta incorrecta. Inténtalo de nuevo.";
+                document.getElementById('error-msg').innerText = "Usuario no encontrado. Revisa la ortografía (Nombres y apellidos).";
             }
         }
 
@@ -632,15 +733,24 @@
         }
 
         // ==========================================
-        // RESULTADOS FINALES
+        // RESULTADOS FINALES Y CONCLUSIONES DINÁMICAS
         // ==========================================
         function mostrarResultados() {
             showScreen('screen-results');
+            
+            // Imprimir datos en el boleto
             document.getElementById('t-name').innerText = currentUser.nombre;
             document.getElementById('t-hours').innerText = currentUser.horas;
             document.getElementById('t-platform').innerText = currentUser.plataforma;
             document.getElementById('t-genre').innerText = currentUser.genero;
             document.getElementById('t-device').innerText = currentUser.dispositivo;
+
+            // Inyectar conclusiones dinámicas en la caja de palomitas
+            document.getElementById('popcorn-content').innerHTML = `
+                <p>1. ${currentUser.c1}</p>
+                <p>2. ${currentUser.c2}</p>
+                <p>3. ${currentUser.c3}</p>
+            `;
         }
     </script>
 </body>
