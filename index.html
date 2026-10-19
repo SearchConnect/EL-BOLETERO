@@ -53,8 +53,21 @@
         h1 { color: var(--accent-red); margin-bottom: 5px; }
         .subtitle { color: #888; margin-top: 0; margin-bottom: 30px; font-family: sans-serif; }
 
-        /* Botones Generales */
-        .btn-general {
+        /* Login */
+        .input-group { margin: 30px 0; }
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #222;
+            color: white;
+            font-family: 'Courier Prime', monospace;
+            text-transform: uppercase;
+        }
+        button {
             background-color: var(--accent-red);
             color: white;
             border: none;
@@ -67,7 +80,7 @@
             transition: transform 0.2s, background 0.2s;
             margin-top: 15px;
         }
-        .btn-general:hover {
+        button:hover {
             background-color: #b20710;
             transform: scale(1.05);
         }
@@ -110,7 +123,7 @@
         .puzzle-tile {
             width: 100%;
             height: 100%;
-            background-color: #1b1b3a; 
+            background-color: #1b1b3a; /* Color base si la imagen no carga */
             background-image: url('image_e7f400.png');
             background-size: 300px 300px;
             cursor: pointer;
@@ -119,7 +132,7 @@
             align-items: center;
             font-size: 2.5rem;
             font-weight: bold;
-            color: rgba(255, 255, 255, 0.6); 
+            color: rgba(255, 255, 255, 0.6); /* Números semi-transparentes */
             text-shadow: 1px 1px 2px black;
         }
         .puzzle-empty {
@@ -149,13 +162,8 @@
             font-family: sans-serif;
             position: relative;
             padding: 15px;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.2s;
         }
-        .option-btn:hover { background: #444; }
+        .option-btn:hover { background: #444; transform: none; }
         
         /* Efectos Trivia */
         .wrong-answer {
@@ -228,37 +236,14 @@
         
         <!-- PANTALLA LOGIN -->
         <div id="screen-login" class="screen active">
-            <!-- Ícono de boleto -->
-            <div style="font-size: 3.5rem; color: #eab308; margin-bottom: -15px;">🎫</div>
-            
-            <!-- Título con brillo -->
-            <h1 style="color: #eab308; text-shadow: 0 0 25px rgba(234, 179, 8, 0.6); font-size: 3.5rem; margin: 10px 0;">EL BOLETERO</h1>
-            
-            <p class="subtitle" style="font-family: 'Courier Prime', monospace; color: #e5e7eb; font-size: 1.1rem; margin-bottom: 5px;">SISTEMA DE ACCESO A DATOS DE CONSUMO AUDIOVISUAL</p>
-            
-            <!-- Créditos solicitados -->
-            <p style="color: #9ca3af; font-family: 'Courier Prime', monospace; font-size: 0.9rem; margin-top: 0; margin-bottom: 30px;">
-                Elaborado por Javier Meza - Jhon Quintero
-            </p>
-
-            <!-- Tarjeta de ingreso -->
-            <div style="background-color: #1f2937; padding: 30px; border-radius: 12px; border: 1px solid #374151; max-width: 400px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                <h3 style="margin-top: 0; font-size: 1.5rem; letter-spacing: 1px; color: #f9fafb;">FRASE SECRETA</h3>
-                <p style="color: #9ca3af; font-size: 0.95rem; margin-bottom: 25px; font-family: sans-serif; line-height: 1.4;">
-                    Para generar tu ticket y ver tus resultados, por favor ingresa la frase mágica para acceder.
-                </p>
-                
-                <div class="input-group" style="margin: 0;">
-                    <input type="text" id="username" placeholder="Escribe aquí la frase..." autocomplete="off" 
-                           style="width: 100%; box-sizing: border-box; background: #111827; border: 1px solid #374151; margin-bottom: 15px; color: #f9fafb; padding: 15px; font-size: 1rem; text-align: center; border-radius: 8px; font-family: 'Courier Prime', monospace; text-transform: uppercase;">
-                    <div id="error-msg"></div>
-                </div>
-                
-                <button onclick="iniciarSesion()" 
-                        style="width: 100%; background-color: #eab308; color: #111827; font-weight: bold; border-radius: 6px; display: flex; justify-content: center; align-items: center; gap: 10px; padding: 15px; font-size: 1.2rem; font-family: 'Oswald', sans-serif; text-transform: uppercase; border: none; cursor: pointer; transition: transform 0.2s;">
-                    VALIDAR IDENTIDAD ➔
-                </button>
+            <h1>El Boletero</h1>
+            <p class="subtitle">Análisis de Datos y Diseño<br><br>Elaborado por Javier Meza y Jhon Quintero</p>
+            <p>Ingresa la frase secreta para iniciar la experiencia.</p>
+            <div class="input-group">
+                <input type="text" id="username" placeholder="EJ: MARIANA VAS A GANAR" autocomplete="off">
+                <div id="error-msg"></div>
             </div>
+            <button onclick="iniciarSesion()">Entrar a la Sala</button>
         </div>
 
         <!-- PANTALLA NIVEL 1: MEMORIA -->
@@ -266,7 +251,7 @@
             <h2>Nivel 1: Memoria Cinéfila</h2>
             <p class="subtitle">Encuentra los 8 pares para avanzar.</p>
             <div class="memory-grid" id="memory-board"></div>
-            <button id="btn-next-level1" class="btn-general" onclick="iniciarNivel2()">Continuar al Nivel 2</button>
+            <button id="btn-next-level1" onclick="iniciarNivel2()">Continuar al Nivel 2</button>
         </div>
 
         <!-- PANTALLA NIVEL 2: ROMPECABEZAS AE -->
@@ -274,7 +259,7 @@
             <h2>Nivel 2: Edición Visual</h2>
             <p class="subtitle">Ordena el logo de After Effects del 1 al 8 deslizando las piezas.</p>
             <div class="puzzle-grid" id="puzzle-board"></div>
-            <button id="btn-next-level2" class="btn-general" onclick="iniciarNivel3()">Continuar a la Trivia</button>
+            <button id="btn-next-level2" onclick="iniciarNivel3()">Continuar a la Trivia</button>
         </div>
 
         <!-- PANTALLA NIVEL 3: TRIVIA -->
@@ -314,7 +299,7 @@
                 </div>
             </div>
             
-            <button class="btn-general" onclick="location.reload()" style="margin-top: 30px;">Reiniciar Juego</button>
+            <button onclick="location.reload()" style="margin-top: 30px;">Reiniciar Juego</button>
         </div>
 
     </div>
@@ -327,6 +312,7 @@
             "USER-01": { nombre: "JHON QUINTERO", horas: "14", plataforma: "NETFLIX / MAX", genero: "TERROR", dispositivo: "CELULAR" },
             "USER-02": { nombre: "EDGAR GORDILLO", horas: "10", plataforma: "AMAZON PRIME", genero: "COMEDIA", dispositivo: "TV" },
             "USER-03": { nombre: "MARIA GOMEZ", horas: "20", plataforma: "DISNEY+", genero: "DRAMA", dispositivo: "TABLET" }
+            // AÑADE MÁS COMPAÑEROS AQUÍ
         };
 
         let currentUser = null;
@@ -354,10 +340,10 @@
                 document.getElementById('error-msg').innerText = "";
                 showScreen('screen-level1');
                 iniciarMinijuegoMemoria();
-                return; // Detiene la función aquí si la frase es correcta
+                return; 
             }
 
-            // 2. Verificación en base de datos si ingresan otro nombre (Opcional)
+            // 2. Verificación en base de datos si ingresan otro nombre
             let inputIdUpper = inputId.toUpperCase();
             let userFound = false;
             
@@ -454,6 +440,7 @@
             puzzleTiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
             let emptyIndex = 8;
             
+            // Mezclar haciendo 50 movimientos legales
             for(let i = 0; i < 50; i++) {
                 let validMoves = [];
                 let row = Math.floor(emptyIndex / puzzleSize);
@@ -485,7 +472,7 @@
                     let origRow = Math.floor(tileValue / puzzleSize);
                     let origCol = tileValue % puzzleSize;
                     tile.style.backgroundPosition = `-${origCol * 100}px -${origRow * 100}px`;
-                    tile.innerText = tileValue + 1; 
+                    tile.innerText = tileValue + 1; // Números de ayuda
                 }
 
                 tile.onclick = () => movePuzzleTile(index);
