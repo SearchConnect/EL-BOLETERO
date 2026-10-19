@@ -243,14 +243,14 @@
 
             <!-- Tarjeta de ingreso -->
             <div style="background-color: #1f2937; padding: 30px; border-radius: 12px; border: 1px solid #374151; max-width: 400px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                <h3 style="margin-top: 0; font-size: 1.5rem; letter-spacing: 1px; color: #f9fafb;">INGRESA TU NOMBRE</h3>
+                <h3 style="margin-top: 0; font-size: 1.5rem; letter-spacing: 1px; color: #f9fafb;">FRASE SECRETA</h3>
                 <p style="color: #9ca3af; font-size: 0.95rem; margin-bottom: 25px; font-family: sans-serif; line-height: 1.4;">
-                    Para generar tu ticket y ver tus resultados, por favor ingresa tu nombre (tal como se te indicó en clase).
+                    Para generar tu ticket y ver tus resultados, por favor ingresa la frase mágica para acceder.
                 </p>
                 
                 <div class="input-group" style="margin: 0;">
-                    <input type="text" id="username" placeholder="EJ: JUAN PEREZ" autocomplete="off" 
-                           style="width: 100%; box-sizing: border-box; background: #111827; border: 1px solid #374151; margin-bottom: 15px; color: #f9fafb; padding: 15px; font-size: 1.2rem; text-align: center; border-radius: 8px; font-family: 'Courier Prime', monospace; text-transform: uppercase;">
+                    <input type="text" id="username" placeholder="Escribe aquí la frase..." autocomplete="off" 
+                           style="width: 100%; box-sizing: border-box; background: #111827; border: 1px solid #374151; margin-bottom: 15px; color: #f9fafb; padding: 15px; font-size: 1rem; text-align: center; border-radius: 8px; font-family: 'Courier Prime', monospace; text-transform: uppercase;">
                     <div id="error-msg"></div>
                 </div>
                 
@@ -327,7 +327,6 @@
             "USER-01": { nombre: "JHON QUINTERO", horas: "14", plataforma: "NETFLIX / MAX", genero: "TERROR", dispositivo: "CELULAR" },
             "USER-02": { nombre: "EDGAR GORDILLO", horas: "10", plataforma: "AMAZON PRIME", genero: "COMEDIA", dispositivo: "TV" },
             "USER-03": { nombre: "MARIA GOMEZ", horas: "20", plataforma: "DISNEY+", genero: "DRAMA", dispositivo: "TABLET" }
-            // AÑADE MÁS COMPAÑEROS AQUÍ
         };
 
         let currentUser = null;
@@ -341,15 +340,33 @@
         // LOGIN
         // ==========================================
         function iniciarSesion() {
-            let inputId = document.getElementById('username').value.trim().toUpperCase();
+            let inputId = document.getElementById('username').value.trim().toLowerCase();
             
+            // 1. Verificación directa de la frase secreta
+            if(inputId === "mariana vas a ganar") {
+                currentUser = { 
+                    nombre: "MARIANA", 
+                    horas: "18", 
+                    plataforma: "NETFLIX / MAX", 
+                    genero: "VARIADO", 
+                    dispositivo: "CELULAR / PC" 
+                };
+                document.getElementById('error-msg').innerText = "";
+                showScreen('screen-level1');
+                iniciarMinijuegoMemoria();
+                return; // Detiene la función aquí si la frase es correcta
+            }
+
+            // 2. Verificación en base de datos si ingresan otro nombre (Opcional)
+            let inputIdUpper = inputId.toUpperCase();
             let userFound = false;
-            if(usersDB[inputId]) {
-                currentUser = usersDB[inputId];
+            
+            if(usersDB[inputIdUpper]) {
+                currentUser = usersDB[inputIdUpper];
                 userFound = true;
             } else {
                 for (let key in usersDB) {
-                    if (usersDB[key].nombre.toUpperCase() === inputId) {
+                    if (usersDB[key].nombre.toUpperCase() === inputIdUpper) {
                         currentUser = usersDB[key];
                         userFound = true;
                         break;
@@ -362,7 +379,7 @@
                 showScreen('screen-level1');
                 iniciarMinijuegoMemoria();
             } else {
-                document.getElementById('error-msg').innerText = "Usuario no encontrado. Revisa la ortografía.";
+                document.getElementById('error-msg').innerText = "Frase incorrecta o usuario no encontrado.";
             }
         }
 
@@ -437,7 +454,6 @@
             puzzleTiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
             let emptyIndex = 8;
             
-            // Mezclar haciendo 50 movimientos legales
             for(let i = 0; i < 50; i++) {
                 let validMoves = [];
                 let row = Math.floor(emptyIndex / puzzleSize);
@@ -469,7 +485,7 @@
                     let origRow = Math.floor(tileValue / puzzleSize);
                     let origCol = tileValue % puzzleSize;
                     tile.style.backgroundPosition = `-${origCol * 100}px -${origRow * 100}px`;
-                    tile.innerText = tileValue + 1; // Números de ayuda
+                    tile.innerText = tileValue + 1; 
                 }
 
                 tile.onclick = () => movePuzzleTile(index);
